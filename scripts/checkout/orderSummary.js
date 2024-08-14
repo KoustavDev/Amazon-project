@@ -1,4 +1,4 @@
-import { cart, removeFromCart, updateDeliveryOptions } from "../../data/cart.js";
+import { cart,addToCart, removeFromCart, updateDeliveryOptions } from "../../data/cart.js";
 import { getProduct, products } from "../../data/products.js";
 import { deliveryOptions, getDeliveryOption } from "../../data/deliveryOptions.js";
 import dayjs from "https://unpkg.com/dayjs@1.11.10/esm/index.js";
@@ -44,8 +44,16 @@ export function renderOrderSummary() {
                     Quantity: <span class="quantity-label">${cartItem.quantity
       }</span>
                   </span>
-                  <span class="update-quantity-link link-primary">
+                  <span class="update-quantity-link link-primary" data-product-id = "${matchingProduct.id}">
                     Update
+                  </span>
+                  <span class="update-on" id="update-target-id-${matchingProduct.id}">
+                  <span>
+                  <input type="number" class="update-box" id="update-quantity-${matchingProduct.id}" autofocus/>
+                  </span>
+                  <span class="link-primary js-save-update" data-product-id = "${matchingProduct.id}">
+                  Save
+                  </span>
                   </span>
                   <span data-product-id = "${matchingProduct.id
       }" class="delete-quantity-link link-primary js-delete-link">
@@ -126,12 +134,38 @@ export function renderOrderSummary() {
       updateQuantityHeader();
     });
   });
+
+  // Only use to toggle delivery box.
+  document.querySelectorAll('.update-quantity-link').forEach((update)=>{
+    update.addEventListener('click', ()=>{
+      const productId = update.dataset.productId;
+      toggleUpdateBox(productId);
+    });
+  });
+
+  // Main delivery box logic.
+  document.querySelectorAll(".js-save-update").forEach((save)=>{
+    save.addEventListener('click',()=>{
+      const productId = save.dataset.productId;
+      let quantity = Number(document.getElementById(`update-quantity-${productId}`).value);
+      quantity = (quantity === 0) ? 1 : quantity;
+      addToCart(productId, quantity);
+      toggleUpdateBox(productId);
+      renderOrderSummary();
+      renderPaymentSummary();
+      updateQuantityHeader();
+    })
+  });
 }
 
 function updateQuantityHeader() {
   let cartQuantity = 0;
-    cart.forEach((item) => {
-      cartQuantity += item.quantity;
-    });
-    document.querySelector('.js-quantity').innerHTML = `${cartQuantity} item`;
+  cart.forEach((item) => {
+    cartQuantity += item.quantity;
+  });
+  document.querySelector('.js-quantity').innerHTML = `${cartQuantity} item`;
+}
+
+function toggleUpdateBox(id) {
+  document.getElementById(`update-target-id-${id}`).classList.toggle('update-on');
 }

@@ -209,3 +209,24 @@
   margin-top: 11px;
   margin-bottom: 15px;
 }
+
+.update-on{
+  display: none;
+}
+
+.update-box{
+  width: 30px;
+  &:focus{
+    outline: none;
+  }
+}
+
+.update-box::-webkit-outer-spin-button,
+.update-box::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.update-box {
+    -moz-appearance: textfield;
+}
